@@ -2,8 +2,6 @@
 
 Builds a first map of the field from free scholarly databases: who works on the question, what they report, where they disagree, what is missing, and a first outline. The result is a working memo, an outline and a list of leads, all `unchecked`. It contains no thesis text.
 
-The method follows OpenDraft's research stages (search, read abstracts, map gaps, outline), carried out by you with `kit/scripts/sources.py`.
-
 ## 1. Prepare
 
 1. Read `thesis/profile.md` and `thesis/question.md`. Without a research question, suggest sharpening it first, because the map gets much better with one. Carry on if the student prefers.
