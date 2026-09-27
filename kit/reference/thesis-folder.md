@@ -1,14 +1,13 @@
 # The thesis folder
 
-Everything the student owns lives in `thesis/`. Setup creates it from `kit/templates/`; the kit never ships it, so kit updates can never collide with it. This file is the single definition of what goes where and in which format.
+Everything the student owns lives in `thesis/`. The kit never ships it, so kit updates can never collide with it. Setup creates `profile.md`, `question.md`, `papers/` and `word/`; every other file and folder is created by the tool that first needs it, from `kit/templates/` where a template exists. This file is the single definition of what goes where and in which format.
 
 ## Layout
 
 | Path | Holds |
 |---|---|
 | `profile.md` | Facts about the thesis and the kit settings. Read it before every job. |
-| `START-HERE.md` | The student's checklist of steps. You tick steps off. |
-| `question.md` | The research question. |
+| `question.md` | The research question, in the student's own words. `sharpen-question.md` adds sub-questions and scope only when the student uses it. |
 | `memo.md` | The exposé (map of the field) and themes from reading. |
 | `outline.md` | The numbered outline. Its section numbers are how everyone names a section ("draft 2.1"). |
 | `sources.md` | Every paper, with its status. |
@@ -18,7 +17,7 @@ Everything the student owns lives in `thesis/`. Setup creates it from `kit/templ
 | `papers/` | The student's PDFs. |
 | `word/` | The student's Word master file, and `template.docx` if the university provides one. |
 | `export/` | Word files made by "export to Word". Never overwritten. |
-| `feedback/` | One checklist per round of supervisor feedback: `2026-10-05.md`. |
+| `feedback/` | One to-do list per round of supervisor feedback: `2026-10-05.md`. |
 
 ## profile.md
 
@@ -77,7 +76,7 @@ A table: `| Date | What the AI did | Where | Tools the student used |`. One row 
 
 ## feedback/
 
-`feedback/<date>.md` holds one round of comments as a checklist:
+`feedback/<date>.md` holds one round of comments as a to-do list:
 
 ```markdown
 # Feedback · 2026-10-05 · Prof. Weber (comments in thesis.docx)

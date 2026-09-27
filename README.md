@@ -2,9 +2,9 @@
 
 A Cursor workspace for writing a thesis from sources you checked yourself.
 
-You open this folder in [Cursor](https://cursor.com), an editor with an AI assistant built in, and the assistant becomes your research and writing partner. It walks you from a vague topic to a handed-in thesis, and it follows one rule throughout: **your text only cites papers you have opened and confirmed yourself.**
+You open this folder in [Cursor](https://cursor.com), an editor with an AI assistant built in, and the assistant becomes your research and writing partner. The kit gives it a set of tools for every part of the work, from finding papers to handing in, and one rule it follows throughout: **your text only cites papers you have opened and confirmed yourself.**
 
-- **A path to follow.** A checklist takes you from topic to hand-in, with the next step always spelled out. Ask "what now?" at any time.
+- **A toolbox, not a path.** Every tool works on its own. Use what helps, whenever it helps, in any order.
 - **Papers you can trust.** Every paper is checked against the official registries (Crossref, DataCite), which catches invented references, wrong DOIs and retracted studies. A paper only counts once *you* confirm you read it.
 - **Writing that stays yours.** The AI drafts one section at a time from your checked papers, marks what it can't back up with `[CHECK]`, and you rewrite it in your own words.
 - **Word in, Word out.** Export to Word when you're ready, keep working there, and sync your latest version and your supervisor's comments back in.
@@ -22,32 +22,45 @@ No coding. You talk to the AI in plain language, and it does the technical parts
 
    > Set up thesis-kit in this folder: run `git clone https://github.com/CTRLMANu/thesis-kit.git .` (if the folder isn't empty, or my computer asks to install developer tools or git, sort it out and walk me through it), then read AGENTS.md and start the setup.
 
-5. **Answer a few questions** about your thesis: topic, field, university, language, citation style, deadline. "Don't know yet" is a fine answer.
+5. **Answer a few questions** about your thesis: your research question or topic, field, university, language, citation style, deadline. "Don't know yet" is a fine answer.
 
 Cursor will ask you to allow the commands the AI runs. The AI tells you what each one does. On a Mac, the first time, a window may offer to install "command line developer tools": click **Install** and wait a few minutes.
 
-When setup is done, open `thesis/START-HERE.md`. That's your map.
+When setup is done, the AI shows you the tools below. Use whichever you need.
 
-## Things you can ask
+## The tools
 
-| Say something like | What happens |
-|---|---|
-| "what now?" | where you stand, and the one next step |
-| "help me sharpen my question" | an interview that turns your topic into one clear research question |
-| "make my exposé" | a map of your field from the scholarly databases: research groups, debates, gaps, a first outline, papers worth opening |
-| "add these sources" + a pasted list, DOIs, a Zotero export or PDFs | papers checked against the registries and added to `sources.md` |
-| "I read Müller 2021: it found …" | that paper becomes *checked*, so it can be cited |
-| "file these notes" + answers from Gemini Notebook or your own notes | notes stored next to the right paper |
-| "use this outline" + your supervisor's structure | imported into `outline.md` |
-| "draft 2.1" | one section drafted from your checked papers, for you to rewrite |
-| "check this sentence: …" | whether your sources really support it |
-| "export to Word" / "sync my Word file" | a new Word file / your latest Word text and comments brought back |
-| "make a checklist from these comments" | supervisor feedback as a to-do list |
-| "write my AI declaration" | a draft declaration from the AI log |
-| "undo that" / "show me 2.1 from last Tuesday" | an earlier saved version |
-| "update my kit" | the latest version of the kit, with your files untouched |
+Use any of them, whenever you like, in any order. Say it in your own words; the phrases are just examples. Ask "what can you do?" in the chat to see this list there.
 
-## Research tools
+**Finding papers**
+- **"make my exposé"**: a map of your field from the scholarly databases: research groups, debates, gaps, a first outline, and the papers the field builds on.
+- **"add these sources"**, plus a pasted list, DOIs, a Zotero export, or PDFs you saved in `thesis/papers/`: each paper checked against the registries and added to `sources.md`.
+
+**Reading and checking**
+- **"I read Müller 2021: it found …"**: that paper becomes *checked*, so it can be cited.
+- **"file these notes"**, plus answers from Gemini Notebook or your own notes: notes stored next to the right paper.
+- **"check this sentence: …"**: whether your checked papers really support it.
+
+**Shaping and writing**
+- **"help me sharpen my question"**: an interview that turns a topic into a precise research question, if you want one.
+- **"use this outline"**, plus your supervisor's structure or your own: imported into `outline.md`.
+- **"draft 2.1"**: one section drafted from your checked papers, for you to rewrite in your own words.
+
+**Word and your supervisor**
+- **"export to Word"**: a new Word file with a formatted reference list.
+- **"sync my Word file"**: your latest Word text, comments and tracked changes brought back. Save the file into `thesis/word/` first.
+- **"make a to-do list from these comments"**: supervisor feedback as a list you work through.
+
+**Handing in**
+- **"write my AI declaration"**: a draft declaration from the AI log.
+
+**Looking after your work**
+- **"undo that"** or **"show me 2.1 from last Tuesday"**: an earlier saved version.
+- **"set up an online backup"**: a private copy of your work on GitHub, if you want one.
+- **"turn the AI log off"** (or on).
+- **"update my kit"**: the latest version of the kit, with your files untouched.
+
+## Tools that work well alongside
 
 These are free to start, and every one is optional. The kit accepts papers and notes from any tool, including ones not listed here.
 

@@ -4,7 +4,7 @@ Builds a first map of the field from free scholarly databases: who works on the 
 
 ## 1. Prepare
 
-1. Read `thesis/profile.md` and `thesis/question.md`. Without a research question, suggest sharpening it first, because the map gets much better with one. Carry on if the student prefers.
+1. Read `thesis/profile.md` and `thesis/question.md`, and work from the question or topic exactly as the student has it. If there is neither, ask what the exposé should be about.
 2. If `thesis/memo.md` or `thesis/outline.md` already has content, say so and agree whether to add to it or replace it.
 3. Tell the student this takes a few minutes and several AI requests, then start.
 
@@ -31,13 +31,15 @@ From the abstracts only:
 
 ## 5. Write it down
 
-1. `thesis/memo.md`: fill Summary (at most 5 lines); Sources overview (a small table: number of works, year range, most common venues, how many had abstracts); Research groups and positions; What the abstracts report; Disagreements; Gaps; Next steps (the 5–10 works to open first, and why). Every finding says it comes from an abstract.
+Create each file from `kit/templates/` if it doesn't exist yet.
+
+1. `thesis/memo.md`: write the sections Summary (at most 5 lines); Sources overview (a small table: number of works, year range, most common venues, how many had abstracts); Research groups and positions; What the abstracts report; Disagreements; Gaps; Central works (the 5–10 works the rest of the field builds on, and why). Every finding says it comes from an abstract.
 2. `thesis/outline.md`: the outline, in the format of `kit/reference/thesis-folder.md`.
 3. `thesis/sources.md`: every work the memo mentions, as `unchecked`, with `Registry check: ok · <date>` (`details` resolved them), `Found via: exposé` and the free full-text link when there is one. Works already in the file are not added again.
 
 ## 6. Hand over
 
-In three or four sentences, tell the student what the map shows, that everything in it is a lead taken from abstracts, and which papers to open first. Suggest the next step: open those papers, then *"I read …: it found …"*.
+In three or four sentences, tell the student what the map shows, where it is (`memo.md`, `outline.md`, `sources.md`), and that everything in it is a lead taken from abstracts.
 
 ## Done when
 

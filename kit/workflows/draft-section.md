@@ -4,7 +4,7 @@ Writes a first version of **one** outline section from the student's checked sou
 
 ## 1. Pin down the section
 
-1. Find the section in `thesis/outline.md` by number or name. Without an outline, offer to make one first (`make-expose.md` or `import-outline.md`); if the student insists, draft from their description of the section.
+1. Find the section in `thesis/outline.md` by number or name. When there is no outline, or the section isn't in it, ask what the section should cover and which chapter it belongs to.
 2. Find its chapter file, `thesis/chapters/NN-name.md`, and read the first line:
    - no file yet, or `master: kit`: the draft goes into the chapter file;
    - `master: word`: the draft goes into `thesis/drafts/<section>-<short-name>.md`, for the student to paste into Word.
@@ -29,7 +29,7 @@ Then stop: one section per request.
 
 ## 4. Hand over
 
-Tell the student where the draft is, which sources it used, and how many `[CHECK]` markers remain and why. Remind them in one sentence that the next step is theirs: rewrite it in their own words and delete the marker line when done.
+Tell the student where the draft is, which sources it used, how many `[CHECK]` markers remain and why, and that it stays marked as an AI draft until they have rewritten it in their own words and deleted the marker line.
 
 ## Done when
 

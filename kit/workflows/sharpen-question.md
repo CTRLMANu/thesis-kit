@@ -14,8 +14,8 @@ Turns a topic into one answerable research question through an interview, and wr
 
    When they are stuck, offer two or three concrete candidate questions and let them pick or combine.
 3. Test the candidate out loud: answerable with sources or data they can get; narrow enough for the length and the deadline; one main question, with sub-questions beneath it; wording that doesn't assume the answer. Say which test it fails, if any, and refine together.
-4. When the student says it's right, fill every section of `thesis/question.md`: research question, 2–4 sub-questions, in scope, out of scope, what would count as an answer, first idea for the method. Their wording wins over yours.
+4. When the student says it's right, write `thesis/question.md`: the research question, then whichever of these came up in the interview: sub-questions, in scope, out of scope, what would count as an answer, first idea for the method. Their wording wins over yours.
 
 ## Done when
 
-`thesis/question.md` holds one research question the student explicitly approved, and every section is filled or marked `open`.
+`thesis/question.md` holds the research question the student explicitly approved, with the parts the interview produced and no empty sections.

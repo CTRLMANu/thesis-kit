@@ -13,7 +13,7 @@ Typical input: the supervisor's suggested structure, a sketch the student typed,
    - **references** → `kit/workflows/add-sources.md`, where they arrive `unchecked` like any other source;
    - **ready-made thesis prose** (whole paragraphs or chapters written by a tool) stays out. Say so, and offer `kit/workflows/draft-section.md`, which drafts from the student's checked sources.
 3. If `thesis/outline.md` already has content, show both briefly side by side and ask: replace, merge, or keep theirs. When the student is unsure, merge and keep their section names.
-4. Write the outline in the format of `kit/reference/thesis-folder.md`: numbered headings, each with a `Purpose:` line taken from the input, or `Purpose: open`.
+4. Write the outline to `thesis/outline.md` (created from `kit/templates/outline.md` the first time) in the format of `kit/reference/thesis-folder.md`: numbered headings, each with a `Purpose:` line taken from the input, or `Purpose: open`.
 
 ## Done when
 

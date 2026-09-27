@@ -11,7 +11,7 @@ Makes a new Word file from the chapters, with a formatted reference list. It alw
    - Checked works with a DOI: `python3 kit/scripts/bibliography.py csl-json <doi> <doi> … -o <tmp>/references.json`.
    - Checked works without a DOI: add a CSL-JSON record for each to `references.json` by hand (`id`, `type`, `title`, `author`, `issued`, and `publisher`, `publisher-place`, `container-title`, `page` or `URL` as they apply), and tell the student to double-check those entries.
    - The style file: `python3 kit/scripts/bibliography.py style <citation style from profile.md> -o ~/.thesis-kit/styles` prints its path.
-5. **Assemble** one markdown file in a temporary folder: a YAML header with `title` (the working title), `author` (the name, if given) and `nocite: '@*'`; the chapters in order; then a references heading in the thesis language (`# References`, `# Literaturverzeichnis`, …) followed by an empty `::: {#refs}` / `:::` block.
+5. **Assemble** one markdown file in a temporary folder: a YAML header with `title` (the `Working title:` in profile.md; if there is none, ask for one and add that line to profile.md), `author` (the name, if given) and `nocite: '@*'`; the chapters in order; then a references heading in the thesis language (`# References`, `# Literaturverzeichnis`, …) followed by an empty `::: {#refs}` / `:::` block.
 6. **Convert**:
 
    ```sh
