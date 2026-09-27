@@ -24,9 +24,20 @@ No coding. You talk to the AI in plain language, and it does the technical parts
 
 5. **Answer a few questions** about your thesis: your research question or topic, field, university, language, citation style, deadline. "Don't know yet" is a fine answer.
 
-Cursor will ask you to allow the commands the AI runs. The AI tells you what each one does. On a Mac, the first time, a window may offer to install "command line developer tools": click **Install** and wait a few minutes.
+Cursor will ask you to allow some of the commands the AI runs; see [below](#when-cursor-asks-you-to-allow-a-command). On a Mac, the first time, a window may offer to install "command line developer tools": click **Install** and wait a few minutes.
 
 When setup is done, the AI shows you the tools below. Use whichever you need.
+
+## When Cursor asks you to allow a command
+
+The kit does its work by running small commands on your computer: saving a version of your files, checking papers against the registries, making a Word file. Cursor checks every command the AI wants to run. Harmless ones go through by themselves; for the others it shows you the command and waits for you to allow it. The AI says in one line what each one does. The kit's commands only touch your thesis folder and the free paper databases.
+
+To be asked less often, open **Cursor Settings → Agents → Approvals & Execution** and add these two entries to the allowlist:
+
+- `git`: saving versions of your work. The kit can't upload anything to the public kit; that is blocked during setup.
+- `python3 kit/scripts/`: the kit's own tools for checking papers and making reference lists.
+
+Commands on the allowlist run without asking; everything else is still checked. There is also a **Run Everything** mode that never asks. It's convenient, but it lets the AI run anything on your computer, so the allowlist is the safer choice.
 
 ## The tools
 
