@@ -11,12 +11,12 @@ Brings the student's Word file back into the kit, so you work from their latest 
    - `pandoc <file> -t markdown --wrap=none --track-changes=all -o <tmp>/marked.md` gives the same text with comments (`[comment]{.comment-start author=… date=…}commented words[]{.comment-end}`), insertions (`[…]{.insertion author=…}`) and deletions (`[…]{.deletion author=…}`).
 4. **Mirror the chapters**: split `clean.md` at its top-level headings and match each chapter to its file in `thesis/chapters/` by number or name. Text before the first chapter goes to `00-front-matter.md`; unnumbered parts after the last chapter (references, appendix) go to `99-<name>.md`. Overwrite every chapter file whose text changed with the Word text, and make its first line `<!-- master: word · thesis/word/<file>.docx · synced <date> -->`. Create files for new chapters. Chapter files the Word file doesn't contain stay as they are.
 5. **Compare** each chapter with its previous saved version: sections added, removed or rewritten, and which sections still carry an AI draft marker or `[CHECK]`.
-6. **Collect feedback**: every comment, insertion and deletion in `marked.md`, with its author, date, section and the words it concerns. Save them as a plain list in `thesis/feedback/<date>.md` and offer to turn them into a checklist (`kit/workflows/supervisor-comments.md`).
+6. **Collect feedback**: every comment, insertion and deletion in `marked.md`, with its author, date, section and the words it concerns. Save them as a plain list in `thesis/feedback/<date>.md`.
 7. **Citations**: find in-text citations in the Word text that match no `checked` entry in `sources.md`.
 
 ## Report
 
-In plain words: which chapters were updated and roughly how; how many comments and tracked changes there were, and from whom; and any citations without a checked source. End with the most useful next step.
+In plain words: which chapters were updated and roughly how; how many comments and tracked changes there were, from whom, and where they are saved; and any citations without a checked source.
 
 ## Done when
 

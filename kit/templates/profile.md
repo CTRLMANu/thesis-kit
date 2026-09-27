@@ -5,7 +5,6 @@ The AI reads this file before every job. Change anything here yourself, or just 
 ## The thesis
 
 - Name:
-- Working title or topic:
 - Field or subject:
 - Degree:
 - University and department:
@@ -14,10 +13,6 @@ The AI reads this file before every job. Change anything here yourself, or just 
 - Citation style:
 - Required length:
 - Deadline:
-
-## How I work
-
-- Research tools I use:
 - University rules on AI:
 
 ## Kit settings

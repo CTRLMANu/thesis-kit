@@ -1,27 +1,3 @@
 # Map of the field
 
-This is a working memo, not thesis text. Everything here comes from abstracts and records, not from papers you have read. Treat it as a list of leads.
-
-## Summary
-
-
-## Sources overview
-
-
-## Research groups and positions
-
-
-## What the abstracts report
-
-
-## Disagreements
-
-
-## Gaps
-
-
-## Next steps
-
-
-## Themes from my reading
-
+A working memo, not thesis text. Findings here come from abstracts and records, or from notes on papers, so treat them as leads until you have read the papers yourself.

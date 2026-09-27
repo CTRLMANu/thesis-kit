@@ -9,7 +9,7 @@ Any input works: a pasted reference list, DOIs, links, titles, a BibTeX or RIS e
 1. **Extract** each work: DOI (from the text, a link, or a PDF's first page), title, authors, year. For a PDF, read its first page and keep the file name for the `PDF:` line.
 2. **Check** them in one run. Write the list as JSON, `[{"doi": "…", "title": "…", "authors": ["Müller, J."], "year": 2021}, …]`, leaving out fields you don't have, to a temporary file outside `thesis/`. Then run `python3 kit/scripts/sources.py check <file>`. Exit code 1 means the registries could not be reached: retry once; if it fails again, add the works with `Registry check: unknown (registries unreachable, re-check)`.
 3. **Skip duplicates**: a work already in `sources.md` (same DOI, or same title and first author) is not added again. If it was `dropped`, tell the student instead of adding it back.
-4. **Add** each new work in the entry format of `kit/reference/thesis-folder.md`:
+4. **Add** each new work to `thesis/sources.md` (created from `kit/templates/sources.md` the first time) in the entry format of `kit/reference/thesis-folder.md`:
    - heading and `Published in:` from the registry record when the check found one, otherwise from the input;
    - `Status: unchecked`;
    - `Registry check:` the verdict and today's date;
