@@ -77,7 +77,7 @@ Everything works on free plans. For the serious writing months, a paid plan with
 
 ## Your files
 
-Your thesis lives in the `thesis/` folder on your computer. After every job the kit saves a version, so "undo" always works. Nothing leaves your computer unless you choose the optional online backup: a private GitHub repository, which needs a free GitHub account and about five minutes of setup (say "set up an online backup"). Keeping everything local is completely fine; just back up your computer as you would anyway.
+Your thesis lives in the `thesis/` folder on your computer. After every job the kit saves a version, so "undo" always works. If you like, the kit can also back your work up online in a private GitHub repository; that needs a free GitHub account and about five minutes of setup (say "set up an online backup"). Keeping everything local is completely fine; just back up your computer as you would anyway.
 
 ## Updating
 
@@ -85,7 +85,7 @@ Say "update my kit". You get the latest instructions and tools, and your `thesis
 
 ## Other AI tools
 
-The instructions live in `AGENTS.md`, a format many AI coding tools read, so tools such as Codex or Claude Code will probably work too (some need to be told to read `AGENTS.md` first). Only Cursor is tested so far. Feedback is welcome.
+The instructions live in `AGENTS.md`, a format many AI coding tools read, so tools such as Codex or Claude Code will probably work too (some need to be told to read `AGENTS.md` first). Feedback is welcome.
 
 ## Manual install
 
@@ -101,6 +101,6 @@ Ideas, bugs and improvements are welcome as [issues](https://github.com/CTRLMANu
 - `kit/templates/`: the files setup copies into a student's `thesis/`
 - `kit/scripts/`: `sources.py` (search, registry checks, abstracts) and `bibliography.py` (reference lists), Python standard library only, no API keys
 
-## Credits and license
+## License
 
-MIT License, see [`LICENSE`](LICENSE). The exception is `kit/scripts/sources.py`, which is Apache-2.0: it is adapted from the OpenDraft port in [getedgehq/skills](https://github.com/getedgehq/skills), which is based on [OpenDraft](https://github.com/federicodeponte/opendraft) by Federico De Ponte (MIT). The exposé job follows OpenDraft's research method. Details are in [`kit/scripts/THIRD_PARTY_NOTICES.md`](kit/scripts/THIRD_PARTY_NOTICES.md).
+MIT License, see [`LICENSE`](LICENSE).

@@ -2,7 +2,7 @@
 
 Brings an outline, a structure or an overview of the field into `thesis/outline.md` and `thesis/memo.md`, wherever it comes from.
 
-Typical input: the supervisor's suggested structure, a sketch the student typed, the chapters a university template requires, the output of another research tool (OpenDraft, an AI chat, a literature review tool), or a Word or PDF file.
+Typical input: the supervisor's suggested structure, a sketch the student typed, the chapters a university template requires, the output of another research tool (an AI chat, a literature review tool), or a Word or PDF file.
 
 ## Steps
 
