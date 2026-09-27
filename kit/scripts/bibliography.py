@@ -30,6 +30,9 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from sources import SSL_CONTEXT  # noqa: E402  (certificate fallback, see sources.py)
+
 UA = "thesis-kit/1.0 (+https://github.com/CTRLMANu/thesis-kit)"
 
 STYLES = {
@@ -66,7 +69,7 @@ def _doi_url(doi):
 
 def _fetch(url, accept, timeout=30):
     req = urllib.request.Request(url, headers={"User-Agent": UA, "Accept": accept})
-    with urllib.request.urlopen(req, timeout=timeout) as r:
+    with urllib.request.urlopen(req, timeout=timeout, context=SSL_CONTEXT) as r:
         ctype = r.headers.get("Content-Type", "")
         body = r.read().decode("utf-8", "replace")
     if "html" in ctype:

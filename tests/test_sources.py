@@ -18,7 +18,7 @@ import sys
 import unittest
 import urllib.error
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 SCRIPT = Path(__file__).resolve().parents[1] / "kit" / "scripts" / "sources.py"
 _spec = importlib.util.spec_from_file_location("sources", SCRIPT)
@@ -61,10 +61,12 @@ class FakeWeb:
     def __init__(self, routes):
         self.routes = routes
         self.calls = []
+        self.contexts = []
 
-    def __call__(self, request, timeout=None):
+    def __call__(self, request, timeout=None, context=None):
         url = request.full_url
         self.calls.append(url)
+        self.contexts.append(context)
         for pattern, answer in self.routes:
             if pattern in url:
                 if isinstance(answer, list):
@@ -190,6 +192,36 @@ class DoiTests(WebTestCase):
     def test_markup_is_stripped_from_abstracts(self):
         jats = "<jats:title>Abstract</jats:title><jats:p>Proteins are  essential.</jats:p>"
         self.assertEqual(sources.plain_text(jats), "Proteins are essential.")
+
+
+# --------------------------------------------------------------------------
+# HTTPS certificates
+# --------------------------------------------------------------------------
+
+class CertificateTests(WebTestCase):
+    def fake_context(self, trusted_certificates):
+        context = MagicMock()
+        context.cert_store_stats.return_value = {"x509_ca": trusted_certificates}
+        return context
+
+    def test_an_empty_certificate_store_falls_back_to_the_system_file(self):
+        # python.org's Python on macOS, before "Install Certificates" was run.
+        context = self.fake_context(0)
+        with patch.object(sources.ssl, "create_default_context", return_value=context), \
+                patch.object(sources.os.path, "exists", lambda p: p == "/etc/ssl/cert.pem"):
+            sources.ssl_context()
+        context.load_verify_locations.assert_called_once_with(cafile="/etc/ssl/cert.pem")
+
+    def test_a_filled_certificate_store_is_left_alone(self):
+        context = self.fake_context(128)
+        with patch.object(sources.ssl, "create_default_context", return_value=context):
+            sources.ssl_context()
+        context.load_verify_locations.assert_not_called()
+
+    def test_every_request_uses_that_context(self):
+        web = self.web([("crossref.org/works/", crossref_one())])
+        sources.lookup(ALPHAFOLD)
+        self.assertEqual(web.contexts, [sources.SSL_CONTEXT])
 
 
 # --------------------------------------------------------------------------
