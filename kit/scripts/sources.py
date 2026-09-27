@@ -397,35 +397,50 @@ def search(topic, n=12, preprints=True):
 # check: does a claimed work match its registry record?
 # --------------------------------------------------------------------------
 
+# "et al." and the German "u. a." stand for authors not listed; they are not names.
+OTHERS = re.compile(r"\bet\.?\s*al\b\.?|\bu\.\s*a\.|\band others\b", re.I)
+
+
 def claimed_families(authors):
     """Family names from any shape: dicts, 'Müller, J.', 'J. Müller',
-    'Müller & Schmidt', or one comma-separated string."""
+    'Müller & Schmidt', 'Jumper et al.', or one comma-separated string."""
     if isinstance(authors, str):
-        authors = re.split(r";| & | and |, (?=[A-ZÄÖÜ][a-zäöüß])", authors)
+        authors = re.split(r";| & | and |, (?=[A-ZÄÖÜ][a-zäöüß])", OTHERS.sub("", authors))
     names = []
     for a in authors or []:
         if isinstance(a, dict):
             name = a.get("family") or a.get("name") or ""
         else:
-            a = str(a).strip()
+            a = OTHERS.sub("", str(a)).strip(" ,;")
             if "," in a:
                 name = a.split(",")[0]
             else:
                 words = [w for w in a.split() if len(w.strip(".")) > 1]
                 name = words[-1] if words else a
         name = fold(name.strip(" ."))
-        if name and name not in ("et al", "et al."):
+        if name:
             names.append(name)
     return names
 
 
+def main_title(text):
+    """The part before a subtitle: 'Cooling the cities – A review of …' -> 'Cooling the cities'."""
+    return re.split(r"\s+[–—-]\s+|[:?!]\s+|\.\s+", text or "", maxsplit=1)[0]
+
+
 def title_similarity(a, b):
-    a, b = title_key(a), title_key(b)
-    if not a or not b:
+    ka, kb = title_key(a), title_key(b)
+    if not ka or not kb:
         return 0.0
-    if a in b or b in a:        # main title against title plus subtitle
-        return 1.0 if min(len(a), len(b)) >= 20 else 0.9
-    return difflib.SequenceMatcher(None, a, b).ratio()
+    if ka == kb:
+        return 1.0
+    ma, mb = title_key(main_title(a)), title_key(main_title(b))
+    if ma and ma == mb and len(ma) >= 10:          # same main title, subtitle left out
+        return 1.0
+    if (ka in kb or kb in ka) and min(len(ka), len(kb)) >= 20:
+        return 0.95
+    # A short fragment ("Introduction") is not a title; only near-identical text counts.
+    return difflib.SequenceMatcher(None, ka, kb).ratio()
 
 
 def match_title(claimed, registry):
@@ -453,7 +468,9 @@ def match_year(claimed, registry_year):
         gap = abs(int(str(claimed)[:4]) - int(registry_year))
     except (TypeError, ValueError):
         return "no"
-    return "yes" if gap == 0 else "close" if gap == 1 else "no"   # online vs. print year
+    # Online-first and print years of one paper can be two years apart
+    # (Santamouris: online 2012, issue 2014).
+    return "yes" if gap == 0 else "close" if gap <= 2 else "no"
 
 
 def title_candidates(title, authors=None):

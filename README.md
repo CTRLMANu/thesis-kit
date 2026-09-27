@@ -100,6 +100,7 @@ Ideas, bugs and improvements are welcome as [issues](https://github.com/CTRLMANu
 - `kit/reference/`: the thesis folder's formats, saving versions, installing tools
 - `kit/templates/`: the files setup copies into a student's `thesis/`
 - `kit/scripts/`: `sources.py` (search, registry checks, abstracts) and `bibliography.py` (reference lists), Python standard library only, no API keys
+- `tests/`: automated tests for `sources.py`, no internet needed. Run them with `python3 -m unittest discover -s tests`
 
 ## License
 
