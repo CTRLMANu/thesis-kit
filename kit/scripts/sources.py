@@ -35,6 +35,7 @@ import difflib
 import json
 import os
 import re
+import ssl
 import sys
 import time
 import unicodedata
@@ -47,6 +48,25 @@ OPENALEX_KEY = os.environ.get("THESIS_KIT_OPENALEX_KEY", "").strip()
 USER_AGENT = "thesis-kit/1.0 (+https://github.com/CTRLMANu/thesis-kit)"
 if CONTACT:
     USER_AGENT += f" (mailto:{CONTACT})"
+
+# Python from python.org on macOS starts with an empty certificate store until
+# its "Install Certificates" step is run, and every HTTPS request then fails.
+# In that case, trust the operating system's certificate file instead.
+SYSTEM_CA_FILES = ("/etc/ssl/cert.pem", "/etc/ssl/certs/ca-certificates.crt",
+                   "/etc/pki/tls/certs/ca-bundle.crt")
+
+
+def ssl_context():
+    context = ssl.create_default_context()
+    if not context.cert_store_stats().get("x509_ca"):
+        for path in SYSTEM_CA_FILES:
+            if os.path.exists(path):
+                context.load_verify_locations(cafile=path)
+                break
+    return context
+
+
+SSL_CONTEXT = ssl_context()
 
 CROSSREF = "https://api.crossref.org"
 DATACITE = "https://api.datacite.org"
@@ -88,7 +108,7 @@ def fetch_json(url, attempts=3, timeout=20):
         request = urllib.request.Request(
             url, headers={"User-Agent": USER_AGENT, "Accept": "application/json"})
         try:
-            with urllib.request.urlopen(request, timeout=timeout) as response:
+            with urllib.request.urlopen(request, timeout=timeout, context=SSL_CONTEXT) as response:
                 data = json.loads(response.read().decode("utf-8", "replace"))
         except urllib.error.HTTPError as err:
             if err.code == 404:
