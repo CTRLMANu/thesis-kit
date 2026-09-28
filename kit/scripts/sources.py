@@ -4,6 +4,9 @@ DataCite, doi.org and OpenAlex: open services, no API key) and add them to
 thesis/sources.md. Part of thesis-kit; standard library only.
 
     sources.py find "topic" [--n 12] [--no-preprints]    prints {"ranked_by", "works"}
+    sources.py related [KEY ...] [--n 30]    works the checked sources (or KEYs) cite or are
+                                   cited by; prints {"seeds", "works"}
+    sources.py coverage            the sources on each outline section's Sources: line
     sources.py check FILE          (a JSON list, or - to read it from stdin)
     sources.py add FILE [--found-via TEXT]       (FILE may be a .bib or .ris export)
     sources.py details DOI [DOI ...]   (the record, abstract and free full-text link)
@@ -15,10 +18,12 @@ the PDF, never from a "doi" field; works without one are looked up by title and
 authors. Verdicts: ok, mismatch, retracted, not-found, no-doi, unknown.
 
 Exit 1: find when no service could be reached (not the same as "nothing
-found"), details when a DOI did not resolve, check when a registry could not be
-asked, add when none could; pdf exits 3 for a scanned PDF without text, 4 when
-no PDF reader is installed. An optional free OpenAlex API key goes in
-THESIS_KIT_OPENALEX_KEY or in the file .tools/openalex-key.
+found"), related when OpenAlex could not be reached or no source to start
+from has a DOI, coverage without an outline, details when a DOI did not
+resolve, check when a registry could not be asked, add when none could; pdf
+exits 3 for a scanned PDF without text, 4 when no PDF reader is installed.
+An optional free OpenAlex API key goes in THESIS_KIT_OPENALEX_KEY or in the
+file .tools/openalex-key.
 """
 import argparse
 import datetime
@@ -229,6 +234,14 @@ def read_entries(text):
     return entries
 
 
+def thesis_entries():
+    """The entries of thesis/sources.md ([] when there is none yet)."""
+    path = REPO / "thesis" / "sources.md"
+    # Only read, never written back: a file saved in another encoding still works.
+    return (read_entries(path.read_text(encoding="utf-8-sig", errors="replace"))
+            if path.exists() else [])
+
+
 def make_key(family, year, taken):
     """A new cite key not in `taken`: make_key("Müller", 2021, {"muller2021"}) -> "muller2021a"."""
     name = re.sub(r"[^a-z]", "", fold(family)) or "anon"
@@ -436,6 +449,140 @@ def search(topic, n=12, preprints=True):
         elif found[same[0]]["type"] in PREPRINTS and rec["type"] not in PREPRINTS:
             found[same[0]] = rec
     return found, ranked_by
+
+
+def print_works(head, works):
+    """Print {**head, "works": [...]} with one compact line per work: every line of a
+    search lands in the AI's context."""
+    lines = []
+    for w in works:
+        line = ({k: w.get(k) for k in ("doi", "title", "authors", "year", "venue", "type",
+                                       "cited_by_count")}
+                | {k: w[k] for k in ("links", "via", "in_sources") if k in w})
+        line["authors"] = (", ".join(a["family"] for a in w["authors"][:3])
+                           + (" et al." if len(w["authors"]) > 3 else ""))
+        lines.append(json.dumps(line, ensure_ascii=False))
+    print("{%s, \"works\": [\n%s\n]}" % (json.dumps(head)[1:-1], ",\n".join(lines)))
+
+
+# ---- related and coverage: more sources for the outline ---------------------
+
+def twin_keys(work):
+    """A work's DOI and its (title, first author), which a preprint shares with its journal
+    version; `work` is a registry record (with authors) or a sources.md entry."""
+    family = label_family(work["label"]) if "label" in work else work["authors"][0]["family"]
+    title = title_key(work["title"])
+    return {k for k in (work["doi"], title and (title, fold(family))) if k}
+
+
+def in_sources(entries):
+    """Each twin key of the sources.md entries -> their '[@key]' (True when an entry has no
+    key or was dropped): what find flags and related leaves out."""
+    return {twin: f"[@{e['key']}]" if e["key"] and e["status"] != "dropped" else True
+            for e in entries for twin in twin_keys(e)}
+
+
+def related(keys, n=30):
+    """Citation chasing: the works the seeds (the entries with these cite keys, else every
+    checked one) cite and are cited by, not yet in sources.md, ranked by how many seeds
+    they link to, then by citations. Prints them as `find` does; returns the exit code."""
+    entries = thesis_entries()
+    by_key = {e["key"]: e for e in entries if e["key"] and e["doi"]}
+    keys = list(dict.fromkeys(k.strip("[]@;, ") for k in keys))    # '[@orben2019],' works too
+    for key in (k for k in keys if k not in by_key):
+        print(f"# {key}: no entry with a DOI in thesis/sources.md, skipped", file=sys.stderr)
+    seeds = ([by_key[k] for k in keys if k in by_key] if keys
+             else [e for e in by_key.values() if e["status"] == "checked"])
+    if not seeds:
+        print("Nothing to start from: related needs checked sources (or the cite keys given) "
+              "with a DOI in thesis/sources.md.")
+        return 1
+    cited_by, cites, records, used = {}, {}, {}, []       # OpenAlex id -> seed keys / record
+    try:
+        for seed in seeds:
+            try:
+                work = fetch_json(openalex_url("works/doi:" + urllib.parse.quote(seed["doi"]),
+                                               select="id,doi,referenced_works"))
+            except NotFound:
+                print(f"# {seed['key']}: not in OpenAlex, skipped", file=sys.stderr)
+                continue
+            used.append(seed["key"])
+            for ref in work.get("referenced_works") or []:
+                cited_by.setdefault(ref.rsplit("/", 1)[-1], []).append(seed["key"])
+            for rec in openalex_works(filter="cites:" + work["id"].rsplit("/", 1)[-1],
+                                      sort="cited_by_count:desc", **{"per-page": 25}):
+                records[rec["openalex_id"]] = rec
+                cites.setdefault(rec["openalex_id"], []).append(seed["key"])
+        ids = [i for i in cited_by if i not in records]
+        for start in range(0, len(ids), 50):
+            for rec in openalex_works(filter="openalex:" + "|".join(ids[start:start + 50]),
+                                      **{"per-page": 50}):
+                records[rec["openalex_id"]] = rec
+    except Exception as err:
+        print(f"OpenAlex is rate-limited or could not be reached ({err}); try again later. "
+              "A free OpenAlex API key in .tools/openalex-key raises the limit.")
+        return 1
+    have, works = in_sources(entries), {}
+    # A preprint and its journal version (other DOIs, same title and first author) are one
+    # work: the journal record is kept, the links of both count.
+    for wid, rec in sorted(records.items(), key=lambda r: r[1]["type"] in PREPRINTS):
+        if citable(rec, PUBLISHED | PREPRINTS) and not have.keys() & (twin := twin_keys(rec)):
+            work = next((works[k] for k in twin if k in works), None) or dict(rec, by=[], cites=[])
+            works.update(dict.fromkeys(twin, work))
+            work["by"] += cited_by.get(wid, [])
+            work["cites"] += cites.get(wid, [])
+    works = {id(w): w for w in works.values()}
+    for work in works.values():
+        work["links"] = len(set(work["by"] + work["cites"]))
+        work["via"] = "; ".join(f"{how} " + ", ".join(f"[@{k}]" for k in used if k in seen)
+                                for how, seen in (("cited by", work["by"]), ("cites", work["cites"]))
+                                if seen)                  # the seeds in their order
+    # On a tie, works citing a seed come first: a paper's own reference list is led by
+    # generic, much-cited methods works (manuals, scales, reporting guidelines).
+    ranked = sorted(works.values(),
+                    key=lambda w: (-w["links"], not w["cites"], -(w["cited_by_count"] or 0)))
+    print_works({"seeds": used}, ranked[:n])
+    return 0
+
+
+def coverage():
+    """Print, for every numbered outline heading, how many sources its Sources: line names
+    by status, then the totals of sources.md; returns the exit code."""
+    outline = REPO / "thesis" / "outline.md"
+    if not outline.exists():
+        print("No thesis/outline.md yet: there are no sections to count sources for.")
+        return 1
+    entries = thesis_entries()
+    status = {e["key"]: e["status"] for e in entries if e["key"]}
+    sections = []                 # [heading, cite keys or None, works named without a key]
+    for line in outline.read_text(encoding="utf-8-sig", errors="replace").splitlines():
+        if (heading := re.match(r"\s*#+\s+(.*?)\s*$", line)):
+            sections.append([heading.group(1), None, ""])
+        elif sections and (named := re.match(r"[\s>*_-]*sources?[*_]*\s*:(.*)", line, re.I)):
+            keys = re.findall(r"@(\w+)", named.group(1))
+            sections[-1][1] = list(dict.fromkeys((sections[-1][1] or []) + keys))
+            if not keys:
+                sections[-1][2] = sections[-1][2] or named.group(1).strip()
+    for i, (heading, keys, names) in enumerate(sections):
+        if not re.match(r"\d+(\.\d+)*\.?(\s|$)", heading):
+            continue                                      # '# Outline', '## Appendix'
+        if keys is None:                                  # a chapter that only groups its sections?
+            below = sections[i + 1][0] if i + 1 < len(sections) else ""
+            grouping = below.startswith(heading.split()[0].rstrip(".") + ".")
+            print(f"{heading}: " + ("see its sections" if grouping else "no Sources line"))
+            continue
+        if not keys and names:
+            print(f"{heading}: Sources line has no cite keys: {names}")
+            continue
+        count = lambda name: sum(status.get(k) == name for k in keys)
+        unknown = [f"[@{k}]" for k in keys if k not in status]
+        print(f"{heading}: {count('checked')} checked, {count('unchecked')} unchecked"
+              + (f", {count('dropped')} dropped" if count("dropped") else "")
+              + (f", {len(unknown)} unknown: {', '.join(unknown)}" if unknown else ""))
+    totals = [e["status"] for e in entries]
+    print(f"sources.md: {totals.count('checked')} checked, {totals.count('unchecked')} "
+          f"unchecked, {totals.count('dropped')} dropped")
+    return 0
 
 
 # ---- PDF text ---------------------------------------------------------------
@@ -1020,6 +1167,10 @@ def main(argv=None):
     cmd.add_argument("--n", type=int, default=12, help="Maximum results (default 12)")
     cmd.add_argument("--no-preprints", action="store_true",
                      help="Leave out preprints (SSRN, arXiv, Research Square, ...)")
+    cmd = sub.add_parser("related", help="Works the checked sources cite or are cited by.")
+    cmd.add_argument("keys", nargs="*", help="Cite keys to start from (default: every checked one)")
+    cmd.add_argument("--n", type=int, default=30, help="Maximum results (default 30)")
+    sub.add_parser("coverage", help="Count the sources on each outline section's Sources: line.")
     sub.add_parser("check", help="Compare claimed works with the registries.").add_argument(
         "file", help="JSON file, or - for stdin")
     cmd = sub.add_parser("add", help="Check works and add them to thesis/sources.md.")
@@ -1035,17 +1186,22 @@ def main(argv=None):
 
     if args.cmd == "find":
         works, ranked_by = search(args.topic, n=args.n, preprints=not args.no_preprints)
-        # One compact line per work: every line of an exposé's searches lands in the AI's context.
+        have = in_sources(thesis_entries())
         for w in works:
-            w["authors"] = (", ".join(a["family"] for a in w["authors"][:3])
-                            + (" et al." if len(w["authors"]) > 3 else ""))
-        keys = ("doi", "title", "authors", "year", "venue", "type", "cited_by_count")
-        lines = [json.dumps({k: w.get(k) for k in keys}, ensure_ascii=False) for w in works]
-        print('{"ranked_by": %s, "works": [\n%s\n]}' % (json.dumps(ranked_by), ",\n".join(lines)))
+            hits = [have[k] for k in [w["doi"], *twin_keys(w)] if k in have]   # the DOI first
+            if hits:
+                w["in_sources"] = hits[0]
+        print_works({"ranked_by": ranked_by}, works)
         if not ranked_by:
             print("# no search service could be reached: this is a failed search, "
                   "not an empty topic", file=sys.stderr)
         return 0 if ranked_by else 1
+
+    if args.cmd == "related":
+        return related(args.keys, args.n)
+
+    if args.cmd == "coverage":
+        return coverage()
 
     if args.cmd == "check":
         results = [check(i) for i in read_items(args.file)]

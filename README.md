@@ -40,6 +40,7 @@ Say it in your own words; the phrases are just examples. Ask "what can you do?" 
 
 **Finding papers**
 - **"make my exposé"**: a map of your field from the scholarly databases: research groups, debates, gaps, a first outline, and the papers the field builds on.
+- **"find sources for 2.1"** or **"look for more sources"**: new leads for one section or the whole thesis, from the databases and from what the papers you've read cite and are cited by.
 - **"add these sources"**, plus a pasted list, DOIs, a Zotero export, or PDFs you saved in `thesis/papers/`: each paper looked up in the registries and added to `sources.md`.
 
 **Reading and checking**
@@ -68,7 +69,7 @@ Say it in your own words; the phrases are just examples. Ask "what can you do?" 
 
 ## Tools that work well alongside
 
-These are free to start, and every one is optional. The kit accepts papers and notes from any tool, including ones not listed here.
+These are free to start, and every one is optional. The kit doesn't connect to them: use them on their own and bring the results in by pasting them or exporting a file (Zotero: .bib or .ris), saying "add these sources" or "file these notes". That works with any tool.
 
 | Tool | Use it to |
 |---|---|
@@ -112,7 +113,7 @@ Ideas, bugs and improvements are welcome as [issues](https://github.com/CTRLMANu
 - `kit/workflows/`: one instruction file per job
 - `kit/reference/`: the thesis folder's formats, saving versions, installing tools
 - `kit/templates/`: the starting files for a student's `thesis/`
-- `kit/scripts/`: `sources.py` (search, registry checks, adding sources, PDF text) and `thesis.py` (saving versions, Word export and sync), Python standard library only, no API key needed
+- `kit/scripts/`: `sources.py` (search, citation chasing, registry checks, adding sources, PDF text) and `thesis.py` (saving versions, Word export and sync), Python standard library only, no API key needed
 - `tests/`: automated tests for both scripts, no internet needed. Run them with `python3 -m unittest discover -s tests`
 - `.cursor/sandbox.json`: the paper databases Cursor's sandbox may reach
 

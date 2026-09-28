@@ -14,12 +14,12 @@ Builds a first map of the field from free scholarly databases: a working memo on
 2. Run each: `python3 kit/scripts/sources.py find "<query>" --n 15`. Label preprints (type `preprint` or `posted-content`) as preprints wherever they appear; rerun a query with `--no-preprints` when they crowd out published work.
    - **Exit code 1**: no database answered. Wait a minute and run it once more; if it fails again, stop and tell the student. Never fill the gap from memory.
    - **`ranked_by` is `crossref`**: OpenAlex was unavailable and the results are weaker. Say so in the memo's Sources overview. If it happens on every query, offer the free OpenAlex key (`kit/reference/tools.md`).
-3. Merge the results and remove duplicates by DOI. Keep the 20–40 most relevant by title, venue and `cited_by_count`. With fewer than 3 in total, stop: tell the student the question may need other words or a broader angle, and propose new queries.
+3. Merge the results, removing duplicates by DOI. Keep the 20–40 most relevant by title, venue and `cited_by_count`. With fewer than 3 in total, stop: tell the student the question may need other words or a broader angle, and propose new queries.
 
 ## 3. Read the abstracts
 
 1. For the kept works, run `python3 kit/scripts/sources.py details <doi> <doi> …`, about 10 DOIs per call.
-2. Leave out retracted works and works whose DOI didn't resolve. For every other work, note its question, method and main finding, and whether you had its `abstract` or only its `title`. Describe method and findings only from an abstract.
+2. Leave out retracted works and DOIs that didn't resolve. For every other work, note its question, method and main finding, and whether you had its `abstract` or only its `title`. Describe method and findings only from an abstract.
 
 ## 4. Write it down
 
@@ -35,12 +35,12 @@ Write from the abstracts only. Create each file from `kit/templates/` if it does
    - **Central works**: the 5–10 most-cited works in the set, with their citation counts.
 
    Every finding says it comes from an abstract.
-2. `thesis/outline.md`: a chapter structure that suits the degree and the kind of question (for an empirical thesis: introduction, literature review, method, results, discussion, conclusion), in the format of `kit/reference/thesis-folder.md`, with a `Sources:` line naming the works that fit each part.
-3. `thesis/sources.md`: write every work the memo names as a JSON list of `{"ref": "<doi>"}` items in a temporary file outside `thesis/`, then run `python3 kit/scripts/sources.py add <file> --found-via "exposé"`.
+2. `thesis/sources.md`: list every work the memo names as `{"ref": "<doi>"}` items in a temporary JSON file outside `thesis/`, then run `python3 kit/scripts/sources.py add <file> --found-via "exposé"`.
+3. `thesis/outline.md`: a chapter structure that suits the degree and the kind of question (for an empirical thesis: introduction, literature review, method, results, discussion, conclusion), in the format of `kit/reference/thesis-folder.md`, with a `Sources:` line of the keys `add` printed for the works that fit each part: `Sources: [@orben2019], [@keles2020]`.
 
 ## 5. Hand over
 
-In three or four sentences: what the map shows, where it is (`memo.md`, `outline.md`, `sources.md`), and that everything in it is a lead taken from abstracts.
+In three or four sentences: what the map shows, where it is (`memo.md`, `outline.md`, `sources.md`), and that everything in it is a lead from abstracts.
 
 ## Done when
 

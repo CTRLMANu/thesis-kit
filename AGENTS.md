@@ -35,6 +35,7 @@ Before doing a job, run `python3 kit/scripts/thesis.py save --own-edits` (not du
 | sharpen or define the research question | `sharpen-question.md` |
 | get an exposé or a first map of the field | `make-expose.md` |
 | add papers: lists, DOIs, exports, PDFs, output from any tool | `add-sources.md` |
+| find more sources, for one section or the whole thesis | `find-sources.md` |
 | mark a paper as read, or drop one | `mark-checked.md` |
 | file notes or answers from reading or another tool | `file-notes.md` |
 | import an outline or overview from anywhere | `import-outline.md` |
