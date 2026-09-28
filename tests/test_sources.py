@@ -1349,10 +1349,235 @@ class PdfCommandTests(unittest.TestCase):
 
 
 # --------------------------------------------------------------------------
+# related and coverage: from thesis/sources.md and thesis/outline.md
+# --------------------------------------------------------------------------
+
+def entry(key, status, doi=""):
+    return (f"### {key.title()} · A title\n- Cite as: [@{key}]\n- Status: {status}\n"
+            + (f"- DOI: {doi}\n" if doi else ""))
+
+
+def ref_ids(url):
+    """The OpenAlex ids an `openalex:W1|W2` request asks for."""
+    query = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
+    return query["filter"][0].split(":", 1)[1].split("|")
+
+
+class ThesisTestCase(WebTestCase):
+    """A thesis folder of its own as REPO; `cli` gives (exit code, stdout, stderr)."""
+
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())
+        self.addCleanup(shutil.rmtree, self.root)
+        (self.root / "thesis").mkdir()
+        repo = patch.object(sources, "REPO", self.root)
+        repo.start()
+        self.addCleanup(repo.stop)
+
+    def sources_md(self, *entries):
+        (self.root / "thesis" / "sources.md").write_text(TEMPLATE + "\n" + "\n".join(entries),
+                                                          encoding="utf-8")
+
+    def cli(self, *argv):
+        out, err = io.StringIO(), io.StringIO()
+        with contextlib.redirect_stdout(out), contextlib.redirect_stderr(err):
+            code = sources.main(list(argv))
+        return code, out.getvalue(), err.getvalue()
+
+
+class RelatedTests(ThesisTestCase):
+    def seed(self, doi, openalex_id, refs):
+        return (f"works/doi:{doi}?", {"id": f"https://openalex.org/{openalex_id}",
+                                      "doi": f"https://doi.org/{doi}",
+                                      "referenced_works": [f"https://openalex.org/{r}" for r in refs]})
+
+    def test_every_checked_source_with_a_doi_is_a_seed_when_no_key_is_given(self):
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"),
+                        entry("keles2020", "unchecked", "10.1/b"),
+                        entry("twenge2018", "checked · 2026-09-01"),
+                        entry("haidt2024", "checked · 2026-09-02", "10.1/d"))
+        web = self.web([self.seed("10.1/a", "WA", []), self.seed("10.1/d", "WD", []),
+                        ("cites%3A", openalex_list())])
+        code, out, _ = self.cli("related")
+        self.assertEqual((code, json.loads(out)), (0, {"seeds": ["orben2019", "haidt2024"],
+                                                       "works": []}))
+        self.assertEqual(len(web.called("works/doi:")), 2)
+
+    def test_given_keys_are_the_seeds_and_the_ones_that_cannot_be_are_named(self):
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"),
+                        entry("keles2020", "unchecked", "10.1/b"),
+                        entry("twenge2018", "checked · 2026-09-01"))
+        web = self.web([("works/doi:10.1/a?", 404), self.seed("10.1/b", "WB", []),
+                        ("cites%3AWB", openalex_list())])
+        code, out, err = self.cli("related", "orben2019", "[@keles2020],", "nobody2000",
+                                  "twenge2018", "keles2020")
+        self.assertEqual((code, json.loads(out)["seeds"]), (0, ["keles2020"]))
+        self.assertEqual(err.splitlines(), [
+            "# nobody2000: no entry with a DOI in thesis/sources.md, skipped",
+            "# twenge2018: no entry with a DOI in thesis/sources.md, skipped",
+            "# orben2019: not in OpenAlex, skipped"])
+        self.assertEqual(len(web.called("works/doi:10.1/b?")), 1)
+
+    def test_cited_and_citing_works_are_merged_ranked_by_links_then_citing_then_citations(self):
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"),
+                        entry("keles2020", "checked · 2026-09-01", "10.1/B"),
+                        entry("twenge2018", "dropped · 2026-09-01 · off topic", "10.1/66"))
+
+        def work(openalex_id, doi, cited, title=None):
+            return openalex_work(doi=doi, openalex_id=openalex_id, cited_by_count=cited,
+                                 title=title or f"A study {doi}")
+        web = self.web([
+            self.seed("10.1/a", "WA", ["W11", "W22", "W55", "W66"]),
+            self.seed("10.1/b", "WB", ["W11", "W33"]),
+            ("cites%3AWA&", openalex_list(work("W33", "10.1/33", 900),
+                                          work("W44", "10.1/44", 50, "Correction to a study"),
+                                          work("W88", "10.1/88", 5000))),
+            ("cites%3AWB&", openalex_list(work("W33", "10.1/33", 900),
+                                          work("W77", "10.1/22", 20))),     # W22's DOI again
+            ("openalex%3A", openalex_list(work("W11", "10.1/11", 100), work("W22", "10.1/22", 20),
+                                          work("W55", None, 3000), work("W66", "10.1/66", 700)))])
+        code, out, _ = self.cli("related")
+        works = json.loads(out)["works"]
+        self.assertEqual(code, 0)
+        self.assertEqual([(w["doi"], w["links"], w["via"]) for w in works], [
+            ("10.1/33", 2, "cited by [@keles2020]; cites [@orben2019], [@keles2020]"),
+            ("10.1/22", 2, "cited by [@orben2019]; cites [@keles2020]"),   # cites a seed: first
+            ("10.1/11", 2, "cited by [@orben2019], [@keles2020]"),         # on a tie
+            ("10.1/88", 1, "cites [@orben2019]")])
+        self.assertEqual(set(works[0]), {"doi", "title", "authors", "year", "venue", "type",
+                                         "cited_by_count", "links", "via"})
+        # A work the forward search brought is not fetched again as a reference.
+        self.assertEqual(ref_ids(web.called("openalex%3A")[0]), ["W11", "W22", "W55", "W66"])
+        self.assertIn("sort=cited_by_count%3Adesc", web.called("cites%3AWA")[0])
+        code, out, _ = self.cli("related", "--n", "2")
+        self.assertEqual([w["doi"] for w in json.loads(out)["works"]], ["10.1/33", "10.1/22"])
+
+    def test_a_preprint_and_its_journal_version_are_one_work_with_the_links_of_both(self):
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"),
+                        entry("keles2020", "checked · 2026-09-01", "10.1/b"))
+        preprint = openalex_work(doi="10.48550/arxiv.1", openalex_id="W1", type_="preprint",
+                                 title="Deep learning for X", cited_by_count=900)
+        article = openalex_work(doi="10.1/journal", openalex_id="W2", title="Deep learning for X")
+        self.web([self.seed("10.1/a", "WA", ["W1"]), self.seed("10.1/b", "WB", ["W2"]),
+                  ("cites%3A", openalex_list()), ("openalex%3A", openalex_list(preprint, article))])
+        works = json.loads(self.cli("related")[1])["works"]
+        self.assertEqual([(w["doi"], w["links"], w["via"]) for w in works], [
+            ("10.1/journal", 2, "cited by [@orben2019], [@keles2020]")])
+        # The journal version is in sources.md already: its preprint is not a new lead.
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"),
+                        entry("keles2020", "checked · 2026-09-01", "10.1/b"),
+                        "### Jumper et al. (2021) · Deep learning for X\n- Cite as: [@jumper2021]\n"
+                        "- Status: unchecked\n- DOI: 10.1/journal\n")
+        self.web([self.seed("10.1/a", "WA", ["W1"]), self.seed("10.1/b", "WB", []),
+                  ("cites%3A", openalex_list()), ("openalex%3A", openalex_list(preprint))])
+        self.assertEqual(json.loads(self.cli("related")[1])["works"], [])
+
+    def test_references_are_fetched_50_at_a_time(self):
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"))
+        web = self.web([self.seed("10.1/a", "WA", [f"W{i}" for i in range(120)]),
+                        ("cites%3A", openalex_list()), ("openalex%3A", openalex_list())])
+        self.assertEqual(self.cli("related")[0], 0)
+        self.assertEqual([len(ref_ids(url)) for url in web.called("openalex%3A")], [50, 50, 20])
+
+    def test_without_a_seed_that_has_a_doi_nothing_is_asked(self):
+        self.web([])
+        self.assertEqual(self.cli("related")[:2], (1, "Nothing to start from: related needs "
+                                                      "checked sources (or the cite keys given) "
+                                                      "with a DOI in thesis/sources.md.\n"))
+        self.sources_md(entry("orben2019", "checked · 2026-09-01"),
+                        entry("keles2020", "unchecked", "10.1/b"))
+        self.assertEqual(self.cli("related")[0], 1)
+        self.assertEqual(self.cli("related", "nobody2000")[0], 1)
+
+    def test_a_rate_limited_openalex_is_said_in_one_line_without_waiting(self):
+        self.sources_md(entry("orben2019", "checked · 2026-09-01", "10.1/a"))
+        self.web([("openalex.org", (429, {"Retry-After": "3600"}, {"error": "slow down"}))])
+        code, out, _ = self.cli("related")
+        self.assertEqual((code, len(out.splitlines()), self.sleeps), (1, 1, []))
+        self.assertIn("rate-limited", out)
+        self.assertIn(".tools/openalex-key", out)
+
+
+OUTLINE = """# Outline
+
+Section numbers name the parts. Sources: [@ignored2000]
+
+## 1 Introduction
+Purpose: why it matters
+
+## 2 Literature review
+Purpose: what is known
+Sources: [@orben2019], [@keles2020]
+
+### 2.1 Definitions
+Purpose: the terms
+- **Sources:** [@orben2019; @twenge2018, p. 3], @keles2020, [@nobody2000], [@orben2019]
+
+#### 2.1.1 Measures
+Sources:
+
+## 3 Results
+Purpose: findings
+
+### 3.1 Main effect
+Source: [@orben2019]
+Sources: [@keles2020]
+
+### 3.2 Side effects
+
+## 4 Discussion
+Sources: Orben & Przybylski (2019); Keles et al. (2020)
+
+## Appendix
+Sources: [@orben2019]
+"""
+
+
+class CoverageTests(ThesisTestCase):
+    def test_each_numbered_section_gets_its_sources_counted_by_status(self):
+        (self.root / "thesis" / "outline.md").write_text(OUTLINE, encoding="utf-8")
+        self.sources_md(entry("orben2019", "checked · 2026-09-01"), entry("keles2020", "unchecked"),
+                        entry("twenge2018", "dropped · 2026-09-01 · off topic"),
+                        entry("haidt2024", "unchecked"))
+        self.assertEqual(self.cli("coverage")[:2], (0, "\n".join([
+            "1 Introduction: no Sources line",
+            "2 Literature review: 1 checked, 1 unchecked",
+            "2.1 Definitions: 1 checked, 1 unchecked, 1 dropped, 1 unknown: [@nobody2000]",
+            "2.1.1 Measures: 0 checked, 0 unchecked",
+            "3 Results: see its sections",
+            "3.1 Main effect: 1 checked, 1 unchecked",
+            "3.2 Side effects: no Sources line",
+            "4 Discussion: Sources line has no cite keys: Orben & Przybylski (2019); "
+            "Keles et al. (2020)",
+            "sources.md: 1 checked, 2 unchecked, 1 dropped"]) + "\n"))
+
+    def test_a_sources_md_saved_in_another_encoding_is_still_read(self):
+        (self.root / "thesis" / "outline.md").write_text("## 1 Intro\nSources: [@muller2021]\n",
+                                                        encoding="utf-8")
+        (self.root / "thesis" / "sources.md").write_bytes(
+            "### Müller (2021) · A title\n- Cite as: [@muller2021]\n- Status: unchecked\n"
+            .encode("cp1252"))
+        self.assertEqual(self.cli("coverage")[:2], (0, "1 Intro: 0 checked, 1 unchecked\n"
+                                                       "sources.md: 0 checked, 1 unchecked, "
+                                                       "0 dropped\n"))
+
+    def test_without_an_outline_it_says_so(self):
+        code, out, _ = self.cli("coverage")
+        self.assertEqual((code, len(out.splitlines())), (1, 1))
+
+
+# --------------------------------------------------------------------------
 # The command line
 # --------------------------------------------------------------------------
 
 class CommandLineTests(WebTestCase):
+    def setUp(self):
+        self.root = Path(tempfile.mkdtemp())       # a REPO without thesis/ unless a test adds it
+        self.addCleanup(shutil.rmtree, self.root)
+        repo = patch.object(sources, "REPO", self.root)
+        repo.start()
+        self.addCleanup(repo.stop)
+
     def run_main(self, argv, stdin=""):
         out = io.StringIO()
         with contextlib.redirect_stdout(out), patch.object(sys, "stdin", io.StringIO(stdin)):
@@ -1385,6 +1610,22 @@ class CommandLineTests(WebTestCase):
         self.assertEqual(work["authors"], "Jumper, Evans, Pritzel et al.")
         self.assertEqual(set(work), {"doi", "title", "authors", "year", "venue", "type",
                                      "cited_by_count"})
+
+    def test_find_marks_the_works_already_in_sources_md(self):
+        (self.root / "thesis").mkdir()
+        (self.root / "thesis" / "sources.md").write_text(
+            TEMPLATE + "\n" + entry("jumper2021", "unchecked", ALPHAFOLD.upper())
+            + "### Jumper et al. (2020) · Deep learning for X\n- Cite as: [@jumper2020]\n"
+            "- Status: dropped · 2026-09-01 · off topic\n- DOI: 10.1/journal\n",
+            encoding="utf-8")
+        self.web([("openalex.org/works?search", openalex_list(
+            openalex_work(), openalex_work(doi="10.1/other", title="Another study"),
+            openalex_work(doi="10.48550/arxiv.1", title="Deep learning for X", type_="preprint")))])
+        works = json.loads(self.run_main(["find", "x"])[1])["works"]
+        # The key to put on a Sources: line; a dropped work (here: another DOI, the same
+        # title and first author) is flagged without one.
+        self.assertEqual([w.get("in_sources") for w in works], ["[@jumper2021]", None, True])
+        self.assertNotIn("in_sources", works[1])
 
     def test_check_reads_stdin_and_a_mismatch_still_exits_0(self):
         self.web([("crossref.org/works/", crossref_one())])

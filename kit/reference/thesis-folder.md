@@ -35,7 +35,7 @@ One `- Field: value` line per fact; the fields are in `kit/templates/profile.md`
 - DOI: 10.1038/s41586-021-03819-2
 - Registry check: ok · 2026-10-01
 - Published in: Nature 596(7873), 583–589
-- Found via: Consensus
+- Found via: search for 2.1
 - Free full text: https://www.nature.com/articles/s41586-021-03819-2.pdf
 - PDF: papers/jumper-2021.pdf
 - In my own words:
@@ -52,7 +52,7 @@ One `- Field: value` line per fact; the fields are in `kit/templates/profile.md`
 
 ## outline.md
 
-Chapters are `## 2 Literature review`, sections `### 2.1 Definitions`, subsections `#### 2.1.1 …`. Under each heading: a `Purpose:` line (what this part has to show) and, once known, a `Sources:` line naming the entries it will draw on.
+Chapters are `## 2 Literature review`, sections `### 2.1 Definitions`, subsections `#### 2.1.1 …`. Under each heading: a `Purpose:` line (what this part has to show) and, once known, a `Sources:` line with the cite keys it will draw on: `Sources: [@orben2019], [@keles2020]`. Keep the labels `Purpose:` and `Sources:` in English, whatever the thesis language, and the keys on that one line; `sources.py coverage` reads them.
 
 ## Chapter files
 
