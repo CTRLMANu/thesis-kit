@@ -5,6 +5,7 @@ The AI reads this file before every job. Change anything here yourself, or just 
 ## The thesis
 
 - Name:
+- Working title:
 - Field or subject:
 - Degree:
 - University and department:

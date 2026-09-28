@@ -1,23 +1,17 @@
 # Sync the Word file
 
-Brings the student's Word file back into the kit, so you work from their latest text, and collects comments and tracked changes. The Word file is the master copy and is read-only for you.
+Brings the student's Word file back into the kit, so you work from their latest text, and collects its comments and tracked changes. The Word file is the master copy of the chapters it holds; the script only reads it.
 
 ## Steps
 
-1. **Find the file**: the `.docx` the student names; otherwise the newest `.docx` in `thesis/word/` other than `template.docx` and Word's temporary `~$…` files. If there is none, explain how to put it there: in Word, *File → Save a Copy* into the `thesis/word/` folder; in Google Docs, *File → Download → Microsoft Word (.docx)*, then move the file there.
-2. **Get pandoc** if needed (`kit/reference/tools.md`).
-3. **Read the file twice**, into a temporary folder outside `thesis/`:
-   - `pandoc <file> -t markdown --wrap=none --track-changes=accept -o <tmp>/clean.md` gives the text as it reads with every change accepted;
-   - `pandoc <file> -t markdown --wrap=none --track-changes=all -o <tmp>/marked.md` gives the same text with comments (`[comment]{.comment-start author=… date=…}commented words[]{.comment-end}`), insertions (`[…]{.insertion author=…}`) and deletions (`[…]{.deletion author=…}`).
-4. **Mirror the chapters**: split `clean.md` at its top-level headings and match each chapter to its file in `thesis/chapters/` by number or name. Text before the first chapter goes to `00-front-matter.md`; unnumbered parts after the last chapter (references, appendix) go to `99-<name>.md`. Overwrite every chapter file whose text changed with the Word text, and make its first line `<!-- master: word · thesis/word/<file>.docx · synced <date> -->`. Create files for new chapters. Chapter files the Word file doesn't contain stay as they are.
-5. **Compare** each chapter with its previous saved version: sections added, removed or rewritten, and which sections still carry an AI draft marker or `[CHECK]`.
-6. **Collect feedback**: every comment, insertion and deletion in `marked.md`, with its author, date, section and the words it concerns. Save them as a plain list in `thesis/feedback/<date>.md`.
-7. **Citations**: find in-text citations in the Word text that match no `checked` entry in `sources.md`.
-
-## Report
-
-In plain words: which chapters were updated and roughly how; how many comments and tracked changes there were, from whom, and where they are saved; and any citations without a checked source.
+1. Run `python3 kit/scripts/thesis.py sync`, or `python3 kit/scripts/thesis.py sync thesis/word/<file>.docx` for the file the student named.
+   - No Word file in `thesis/word/`: tell the student to save their file there and write in that copy from then on: in Word, *File → Save As* (*Save a Copy* for files in OneDrive) into `thesis/word/`; from Google Docs, *File → Download → Microsoft Word (.docx)* into `thesis/word/` before every sync, replacing the old file under the same name.
+   - Several Word files: ask which one they work in, and run it again with that file.
+   - No Heading 1 styles: ask the student to give each chapter title the style *Heading 1* in Word, save, and sync again.
+2. Read the new mirrors in `thesis/chapters/` for citations that match no `checked` entry in `sources.md`. In Word, citations are plain text; report them and change nothing.
+3. **Report** in plain words everything the script printed (chapters updated, created, removed or still written in the kit; comments and tracked changes, by person; AI-draft comments; `[CHECK]` markers) and the citations from step 2. The text of removed chapters stays in the saved versions; the comments and tracked changes are in `thesis/feedback/word-comments.md`.
+4. If the report lists chapters "still written in the kit" whose text differs from the Word file, end the report by asking once, naming them: "Do you write chapter N in Word from now on?" Everything else is already brought in; the answer only decides whether the kit's text of those chapters is replaced by the Word text. If the report lists tracked changes not yet accepted, say that a yes takes the chapter's text as if they were accepted (in Word they stay open to accept or reject). For each yes, run it again with `--move N` (or `--move all`), check that chapter's citations as in step 2, and say which chapters now follow Word; the kit's text stays in the saved versions.
 
 ## Done when
 
-Every chapter in the Word file is mirrored in `thesis/chapters/` with the Word master line; comments and tracked changes are saved in `thesis/feedback/`; and the Word file itself is unchanged.
+Every chapter in the Word file is mirrored in `thesis/chapters/` or reported as still written in the kit, the student was asked about every such chapter that differs, and the Word file is unchanged.

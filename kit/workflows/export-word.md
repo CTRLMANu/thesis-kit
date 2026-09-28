@@ -1,26 +1,17 @@
 # Export to Word
 
-Makes a new Word file from the chapters, with a formatted reference list. It always creates a new file and never overwrites one.
+Makes a new Word file from the chapters written in the kit, or from single chapters or drafts, with citations and a reference list in the profile's citation style.
 
 ## Steps
 
-1. **Choose the chapters**: all files in `thesis/chapters/` in order, or the ones the student named. When a chapter's first line says `master: word`, warn that it already lives in their Word file: the export makes a separate copy, and their Word file stays the master.
-2. **Get pandoc** if needed (`kit/reference/tools.md`).
-3. **Count markers** in the chosen chapters: `[CHECK: …]` markers and AI draft markers. Tell the student the numbers and ask whether to export anyway. `[CHECK]` markers stay visible in the Word file; the AI draft marker lines are hidden comments and don't appear.
-4. **References**: match every in-text citation in the chosen chapters to an entry in `sources.md`. Citations with no match, or whose entry isn't `checked`, are left out of the reference list and listed for the student.
-   - Checked works with a DOI: `python3 kit/scripts/bibliography.py csl-json <doi> <doi> … -o <tmp>/references.json`.
-   - Checked works without a DOI: add a CSL-JSON record for each to `references.json` by hand (`id`, `type`, `title`, `author`, `issued`, and `publisher`, `publisher-place`, `container-title`, `page` or `URL` as they apply), and tell the student to double-check those entries.
-   - The style file: `python3 kit/scripts/bibliography.py style <citation style from profile.md> -o ~/.thesis-kit/styles` prints its path.
-5. **Assemble** one markdown file in a temporary folder: a YAML header with `title` (the `Working title:` in profile.md; if there is none, ask for one and add that line to profile.md), `author` (the name, if given) and `nocite: '@*'`; the chapters in order; then a references heading in the thesis language (`# References`, `# Literaturverzeichnis`, …) followed by an empty `::: {#refs}` / `:::` block.
-6. **Convert**:
+1. Run `python3 kit/scripts/thesis.py export` for every chapter still written in the kit, or name the files the student asked for: `python3 kit/scripts/thesis.py export thesis/drafts/2.1-definitions.md` ("export 2.1 to Word").
+2. If it can't reach doi.org, tell the student nothing was exported and to try again when they are online.
+3. If it asks for records, complete them as it says (never from memory; the student can fill gaps), check any DOI it questions with the student, then run it again. Fix problems it reports in `thesis/references.json` the same way.
+4. **Report** in plain words: the new file's path; the style and any notes on it; the `[CHECK]` markers (they stay visible) and AI-draft sections (they show as Word comments); citations left out of the reference list and why; and the references typed from the sources list, which the student checks against the book or page.
+5. Tell the student how to go on in Word. When `thesis/word/` has no Word file yet: open the new file, save it into `thesis/word/` (*File → Save As*), write in that file from then on, and say "sync my Word file" whenever the kit should see their latest text. When they already write in a Word file there: copy the new text into it. In Word they add the title page, the table of contents (*References → Table of Contents*) and page numbers. A university template set as `Word template:` in profile.md controls heading styles, fonts and margins.
 
-   ```sh
-   pandoc <tmp>/thesis.md --citeproc --bibliography=<tmp>/references.json --csl=<style file> -o thesis/export/thesis-<YYYY-MM-DD>.docx
-   ```
-
-   Add `--reference-doc=<template>` when `Word template:` in profile.md names a file. If a file with today's name exists, add `-2`, `-3`, … to the name.
-7. **Report**: the new file's path; what the template controls (heading styles, fonts, margins) and what the student adds by hand in Word (title page, table of contents under *References → Table of Contents*, page numbers); and the citations that had no checked source.
+Numeric styles (IEEE, Vancouver) are numbered correctly only while every chapter is still written in the kit and exported together.
 
 ## Done when
 
-A new `.docx` exists in `thesis/export/` and no existing file was overwritten; every entry in its reference list belongs to a `checked` source; and the student knows about any remaining `[CHECK]` markers and unmatched citations.
+A new `.docx` exists in `thesis/export/`, no file was overwritten, and the student knows everything the report listed.

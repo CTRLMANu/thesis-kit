@@ -7,7 +7,7 @@ Typical input: answers from Gemini Notebook or Elicit, highlights, the student's
 ## Steps
 
 1. Split the input into individual notes. Keep page numbers, quotes and the tool's own source references.
-2. Match each note to entries in `thesis/sources.md` by author, year, title or the tool's citation. A note that spans several works (a theme, a disagreement, a comparison) goes to `thesis/memo.md` under a section "Themes from my reading", naming the works it concerns. Create the file from `kit/templates/memo.md`, or the section, the first time.
+2. Match each note to entries in `thesis/sources.md` by author, year, title or the tool's citation. A note that spans several works (a theme, a disagreement, a comparison) goes to `thesis/memo.md` under "Themes from my reading", naming the works. Create the file (from `kit/templates/memo.md`) or the section the first time.
 3. Append each matched note under the entry's `Notes:` as `- <date> · <origin> · <page, if any>: <note>`. The origin is the tool's name, or `my reading` for the student's own notes. Quotes stay verbatim, in quotation marks.
 4. For a note about a work that is not in `sources.md`, ask whether to add it; on yes, run `kit/workflows/add-sources.md`.
 5. Report how many notes went where, and any you could not match.
