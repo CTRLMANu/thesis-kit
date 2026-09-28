@@ -6,13 +6,13 @@ Typical input: the supervisor's suggested structure, a sketch the student typed,
 
 ## Steps
 
-1. Read the input. For a `.docx`, get pandoc if needed (`kit/reference/tools.md`) and run `pandoc <file> -t markdown --wrap=none`. For a PDF, read its text.
+1. Read the input. For a `.docx`, get pandoc if needed (`kit/reference/tools.md`) and run `pandoc <file> -t markdown --wrap=none`. For a PDF, run `python3 kit/scripts/sources.py pdf <file> --pages 1-50` (or `--find "<term>"` in a long one).
 2. Sort what it contains:
    - **structure** (chapters, sections, their purpose) → the outline;
    - **overview of the field** (groups, debates, gaps, summaries) → `memo.md`, marked with where it came from;
    - **references** → `kit/workflows/add-sources.md`, where they arrive `unchecked` like any other source;
-   - **ready-made thesis prose** (whole paragraphs or chapters written by a tool) stays out. Say so, and offer `kit/workflows/draft-section.md`, which drafts from the student's checked sources.
-3. If `thesis/outline.md` already has content, show both briefly side by side and ask: replace, merge, or keep theirs. When the student is unsure, merge and keep their section names.
+   - **ready-made thesis prose** (paragraphs or chapters written by a tool) stays out. Say so, and offer `kit/workflows/draft-section.md`, which drafts from the student's checked sources.
+3. If `thesis/outline.md` already has content, show both briefly side by side and ask: replace, merge, or keep theirs. If they are unsure, merge and keep their section names.
 4. Write the outline to `thesis/outline.md` (created from `kit/templates/outline.md` the first time) in the format of `kit/reference/thesis-folder.md`: numbered headings, each with a `Purpose:` line taken from the input, or `Purpose: open`.
 
 ## Done when

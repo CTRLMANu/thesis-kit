@@ -1,15 +1,17 @@
 # Set up the online backup
 
-Connects the thesis to a **private** GitHub repository, so every saved version is also stored online. This is optional, and the student decides.
+Connects the thesis to a **private** GitHub repository, so every saved version is also stored online. It is optional.
 
 ## 1. Explain and confirm
 
-In plain words: it needs a free GitHub account (sign-up at https://github.com/signup takes a few minutes); the repository is private, so only they can see it; from then on, each saved version is also uploaded. Continue only on a clear yes. If they have no account yet, give them the link and wait until they do.
+In plain words: it needs a free GitHub account (sign-up at https://github.com/signup takes a few minutes); the repository is private, so only they can see it; from then on, each saved version is also uploaded, except PDFs in `thesis/papers/`. Continue only on a clear yes. If they have no account yet, give them the link and wait until they do.
+
+Signing in and creating the repository need the student's approval to run outside Cursor's sandbox.
 
 ## 2. Get the GitHub tool and sign in
 
-1. Get `gh` if needed (`kit/reference/tools.md`). Below, `gh` means its full path if it lives in `~/.thesis-kit/tools/`.
-2. Run `gh auth status`. If not signed in, run `gh auth login --hostname github.com --git-protocol https --web`. It prints a one-time code: show the code to the student, have them open https://github.com/login/device, enter it and approve. If the command waits for a keypress you can't give, ask the student to open Cursor's terminal (*Terminal → New Terminal*), paste the same command, press Enter and follow it.
+1. Get `gh` if needed (`kit/reference/tools.md`). Below, `gh` means `.tools/gh/bin/gh` when it is not on the PATH.
+2. `gh auth status`. If not signed in: `gh auth login --hostname github.com --git-protocol https --web`. It prints a one-time code: show it to the student, who opens https://github.com/login/device, enters it and approves. If it waits for a keypress you can't give, ask the student to open Cursor's terminal (*Terminal → New Terminal*), paste the same command, press Enter and follow it.
 3. `gh auth setup-git`, so git can upload with that sign-in.
 
 ## 3. Create the repository and upload
@@ -20,7 +22,7 @@ In plain words: it needs a free GitHub account (sign-up at https://github.com/si
 
 ## 4. Record it
 
-Set `Online backup: yes · <repository URL>` in `thesis/profile.md` and save a version, which is now uploaded too. Tell the student where they can see it online.
+Set `Online backup: yes · <repository URL>` in `thesis/profile.md`, then run `python3 kit/scripts/thesis.py save "set up the online backup"`, which uploads the new version. Tell the student where they can see it online.
 
 ## Done when
 

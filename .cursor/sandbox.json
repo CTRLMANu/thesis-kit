@@ -1,0 +1,15 @@
+{
+  "networkPolicy": {
+    "allow": [
+      "api.openalex.org",
+      "api.crossref.org",
+      "api.datacite.org",
+      "data.crosscite.org",
+      "data.medra.org",
+      "ra.publications.europa.eu",
+      "japanlinkcenter.org",
+      "doi.org",
+      "www.zotero.org"
+    ]
+  }
+}
