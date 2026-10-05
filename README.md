@@ -20,7 +20,7 @@ No coding. You talk to the AI in plain language, and it does the technical parts
 3. **Open the folder in Cursor:** *File → Open Folder…*
 4. **Open the AI chat** (the panel on the right; if you don't see it, press `Cmd+L` on a Mac or `Ctrl+L` on Windows). If there is a mode menu, choose **Agent**. Then paste this sentence:
 
-   > Set up thesis-kit in this folder: run `git clone https://github.com/CTRLMANu/thesis-kit.git .` outside Cursor's sandbox (if the folder isn't empty, or my computer asks to install developer tools or git, sort it out and walk me through it), then read AGENTS.md and start the setup.
+   > Set up thesis-kit in this folder: run `git clone https://github.com/squaloo-studio/thesis-kit.git .` outside Cursor's sandbox (if the folder isn't empty, or my computer asks to install developer tools or git, sort it out and walk me through it), then read AGENTS.md and start the setup.
 
    Cursor asks you to allow this first command, which downloads the kit: click allow.
 
@@ -105,11 +105,11 @@ The instructions live in `AGENTS.md`, which many AI coding tools read, so Codex,
 
 ## Manual install
 
-If the one-sentence setup doesn't work for you: install git, clone this repository (`git clone https://github.com/CTRLMANu/thesis-kit.git my-thesis`, or use *Clone repo* on Cursor's start screen), open the folder in Cursor, and say "start" in the chat.
+If the one-sentence setup doesn't work for you: install git, clone this repository (`git clone https://github.com/squaloo-studio/thesis-kit.git my-thesis`, or use *Clone repo* on Cursor's start screen), open the folder in Cursor, and say "start" in the chat.
 
 ## Contributing
 
-Ideas, bugs and improvements are welcome as [issues](https://github.com/CTRLMANu/thesis-kit/issues) and pull requests. When you open this repository to work on the kit itself, tell the AI so, and it skips the student setup. How the kit works:
+Ideas, bugs and improvements are welcome as [issues](https://github.com/squaloo-studio/thesis-kit/issues) and pull requests. When you open this repository to work on the kit itself, tell the AI so, and it skips the student setup. How the kit works:
 
 - `AGENTS.md`: the rules and the list of jobs, loaded in every chat
 - `kit/workflows/`: one instruction file per job

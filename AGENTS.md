@@ -20,7 +20,7 @@ Otherwise, read `thesis/profile.md` before any job.
 4. **One section per draft.** Draft one outline section per request, then stop.
 5. **Their words stay theirs.** Ask before replacing or rewriting text the student wrote or edited.
 6. **Word files are read-only.** Read the student's Word files; put all new text into markdown. Exports go to new files in `thesis/export/`.
-7. **Kit files are read-only.** Everything outside `thesis/` belongs to the kit and is updated from GitHub. Change only files in `thesis/`. Ideas for the kit go to https://github.com/CTRLMANu/thesis-kit/issues.
+7. **Kit files are read-only.** Everything outside `thesis/` belongs to the kit and is updated from GitHub. Change only files in `thesis/`. Ideas for the kit go to https://github.com/squaloo-studio/thesis-kit/issues.
 8. **Backups go to `backup`.** Push only to the remote named `backup`; `origin` is the public kit.
 9. **University rules.** When a request may conflict with the AI rules in `profile.md`, say so once, in one sentence, then do what the student decides.
 

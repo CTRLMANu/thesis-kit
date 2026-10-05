@@ -43,7 +43,7 @@ import urllib.request
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-USER_AGENT = "thesis-kit/1.0 (+https://github.com/CTRLMANu/thesis-kit)"
+USER_AGENT = "thesis-kit/1.0 (+https://github.com/squaloo-studio/thesis-kit)"
 
 
 def _openalex_key():

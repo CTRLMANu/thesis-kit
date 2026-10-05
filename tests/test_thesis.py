@@ -276,7 +276,7 @@ class Save(Workspace):
                       "(! [rejected] HEAD -> main", out)
 
     def test_warns_when_origin_can_receive_uploads(self):
-        self.git("remote", "add", "origin", "https://github.com/CTRLMANu/thesis-kit.git")
+        self.git("remote", "add", "origin", "https://github.com/squaloo-studio/thesis-kit.git")
         self.write("thesis/memo.md", "memo\n")
         out = self.main("save", "wrote the memo")[1]
         self.assertEqual(out.splitlines()[0], "saved: wrote the memo")
