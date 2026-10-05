@@ -20,7 +20,9 @@ No coding. You talk to the AI in plain language, and it does the technical parts
 3. **Open the folder in Cursor:** *File → Open Folder…*
 4. **Open the AI chat** (the panel on the right; if you don't see it, press `Cmd+L` on a Mac or `Ctrl+L` on Windows). If there is a mode menu, choose **Agent**. Then paste this sentence:
 
-   > Set up thesis-kit in this folder: run `git clone https://github.com/CTRLMANu/thesis-kit.git .` (if the folder isn't empty, or my computer asks to install developer tools or git, sort it out and walk me through it), then read AGENTS.md and start the setup.
+   > Set up thesis-kit in this folder: run `git clone https://github.com/CTRLMANu/thesis-kit.git .` outside Cursor's sandbox (if the folder isn't empty, or my computer asks to install developer tools or git, sort it out and walk me through it), then read AGENTS.md and start the setup.
+
+   Cursor asks you to allow this first command, which downloads the kit: click allow.
 
 5. **Answer a few questions** about your thesis: your research question or topic, field, university, language, citation style, deadline. "Don't know yet" is a fine answer.
 
@@ -30,7 +32,7 @@ On a Mac, the first time, a window may offer to install "command line developer 
 
 The kit works by running small commands on your computer: saving a version of your files, checking papers against the registries, making a Word file. Cursor runs them in a protected space, a sandbox, that can only change this folder and reach a few websites. The kit brings a list of the free paper databases it may reach, so these commands go through by themselves.
 
-A few commands need more: changing git's settings during setup, updating the kit, setting up the online backup, installing a tool. For those, Cursor shows you the command and waits for you to allow it, and the AI says in one line what it does.
+A few commands need more: downloading the kit at the start, changing git's settings during setup, updating the kit, setting up the online backup, installing a tool. For those, Cursor shows you the command and waits for you to allow it, and the AI says in one line what it does.
 
 If your Cursor asks before every command instead (set under **Cursor Settings → Agents → Approvals & Execution**), add the kit's own tools to the allowlist: `python3 kit/scripts/` (on Windows: `py -3 kit/scripts/`). A **Run Everything** mode never asks, but it lets the AI run anything on your computer, so the sandbox or the allowlist is safer.
 
